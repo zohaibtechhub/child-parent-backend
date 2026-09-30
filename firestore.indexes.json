@@ -1,0 +1,55 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "messages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "senderId",   "order": "ASCENDING" },
+        { "fieldPath": "recipientId","order": "ASCENDING" },
+        { "fieldPath": "timestamp",  "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "flaggedLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentUid",  "order": "ASCENDING" },
+        { "fieldPath": "timestamp",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "phrases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "addedBy",    "order": "ASCENDING" },
+        { "fieldPath": "createdAt",  "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "safetyRules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentUid",  "order": "ASCENDING" },
+        { "fieldPath": "createdAt",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "safetyRules",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentUid",  "order": "ASCENDING" },
+        { "fieldPath": "type",       "order": "ASCENDING" },
+        { "fieldPath": "text",       "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "incidents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "parentUid",  "order": "ASCENDING" },
+        { "fieldPath": "timestamp",  "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

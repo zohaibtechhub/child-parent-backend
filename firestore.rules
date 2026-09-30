@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── users ────────────────────────────────────────────────────────────────
+    // Each user can only read/write their own profile document.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null &&
+        resource.data.role == 'child' &&
+        resource.data.parentUid == request.auth.uid;
+    }
+
+    // ── pairings ─────────────────────────────────────────────────────────────
+    // Any authenticated user can read a pairing code (to join it).
+    // Only a parent can create one.
+    // Only a parent can mark it used (write after creation).
+    match /pairings/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
+      allow update: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent';
+    }
+
+    // ── phrases ──────────────────────────────────────────────────────────────
+    // Parent can create / delete their own phrases.
+    // Child can read phrases (needed for future client-side pre-check, optional).
+    match /phrases/{phraseId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'parent' &&
+        request.resource.data.addedBy == request.auth.uid;
+      allow delete: if request.auth != null &&
+        resource.data.addedBy == request.auth.uid;
+    }
+
+    // ── safetyRules ─────────────────────────────────────────────────────────
+    // Parent-managed whitelist/blacklist/trusted-contact rules.
+    match /safetyRules/{ruleId} {
+      allow read, delete: if request.auth != null &&
+        resource.data.parentUid == request.auth.uid;
+      allow create: if request.auth != null &&
+        request.resource.data.parentUid == request.auth.uid;
+      allow update: if request.auth != null &&
+        resource.data.parentUid == request.auth.uid &&
+        request.resource.data.parentUid == request.auth.uid;
+    }
+
+    // ── messages ─────────────────────────────────────────────────────────────
+    // Only the sender or recipient of a message can read it.
+    // Writes go exclusively through the backend (Firebase Admin SDK bypasses these rules).
+    match /messages/{messageId} {
+      allow read: if request.auth != null &&
+        (resource.data.senderId == request.auth.uid ||
+         resource.data.recipientId == request.auth.uid);
+      allow write: if false; // backend-only
+    }
+
+    // ── globalPhrases ─────────────────────────────────────────────────────────
+    // System-wide flagged phrase list managed by the app (Admin SDK only).
+    // Any authenticated user can read it (needed for potential future client-side use).
+    // No client writes — ever.
+    match /globalPhrases/{phraseId} {
+      allow read:  if request.auth != null;
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── flaggedLogs ───────────────────────────────────────────────────────────
+    // Only the parent linked to this log can read it.
+    // Writes go exclusively through the backend.
+    match /flaggedLogs/{logId} {
+      allow read: if request.auth != null &&
+        resource.data.parentUid == request.auth.uid;
+      allow write: if false; // backend-only
+    }
+
+    // ── incidents ────────────────────────────────────────────────────────────
+    // Parent can review their own incident records. Writes go through backend.
+    match /incidents/{incidentId} {
+      allow read: if request.auth != null &&
+        resource.data.parentUid == request.auth.uid;
+      allow write: if false; // backend-only
+    }
+  }
+}

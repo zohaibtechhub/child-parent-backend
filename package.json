@@ -1,0 +1,19 @@
+{
+  "name": "parent-patrol-backend",
+  "version": "1.0.0",
+  "description": "Parent Patrol backend — scanning engine, auth, messaging, pairing",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
