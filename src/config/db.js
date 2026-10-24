@@ -17,3 +17,4 @@ const COLLECTIONS = {
 };
 
 module.exports = { db, COLLECTIONS };
+ 
